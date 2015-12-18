@@ -1,0 +1,6 @@
+name = Locale Tools
+description = A library of helpful locale helpers by Revagomes.
+core = 7.x
+package = Dev tool suite
+version = 7.x-1.0
+dependencies[] = locale

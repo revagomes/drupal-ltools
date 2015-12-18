@@ -1,0 +1,102 @@
+<?php
+
+
+/**
+ * 
+ */
+ * @file ltools.module
+ * Locale tools module main file.
+ */
+
+
+/**
+ * Add translations from a PO file.
+ * This will populate the locales_target table in the database
+ * with the strings from the PO file.
+ *
+ * @param string $langcode                The language code (e.g. fr, de, it)
+ * @param string $po_file                  Full path to .po file
+ * @param const $mode                     LOCALE_IMPORT_OVERWRITE (overwrite existing translations) or LOCALE_IMPORT_KEEP (only import new strings)
+ * @param string $group                   Text group to import PO file into (eg. 'default' for interface translations)
+ * @param array $add_language_options     Optional parameters for locale_add_language (name, native, direction, domain, prefix, enabled, default)
+ * @return bool                           Success
+ */
+function ltools_update_load_language($langcode, $po_file, $new_lang = FALSE, $mode = LOCALE_IMPORT_OVERWRITE, $group = 'default', $add_language_options = array()) {
+
+  if ($new_lang) {
+    $add_language_defaults = array(
+      'name' => NULL,
+      'native' => NULL,
+      'direction' => LANGUAGE_LTR,
+      'domain' => '',
+      'prefix' => '',
+      'enabled' => TRUE,
+      'default' => FALSE,
+    );
+
+    $options = array_merge($add_language_defaults, $add_language_options);
+
+    locale_add_language($langcode, $options['name'], $options['native'], $options['direction'], $options['domain'], $options['prefix'], $options['enabled'], $options['default']);
+  }
+
+  // mimic a drupal uploaded file object, with the necessary info needed by _locale_import_po
+  $file = new stdClass;
+  $file->filepath = $po_file;
+  $file->filename = basename($po_file);
+
+  return _locale_import_po($file, $langcode, $mode, $group);
+}
+
+/**
+ * Find all po files under a given path
+ *
+ * @param string $path.
+ * @param boolean $recursive.
+ * @return array of string paths to po files.
+ */
+function ltools_find_po_files($path, $recursive = TRUE) {
+
+  $path = rtrim($path, '/') . '/*';
+  $pattern = '/\.po$/';
+  $files = array();
+
+  foreach (glob ($path) as $fullname) {
+    if ($recursive && is_dir($fullname)) {
+      $files = array_merge($files, ltools_find_po_files($fullname, $recursive));
+    }
+    else if (preg_match($pattern, $fullname)) {
+      $files[] = $fullname;
+    }
+  }
+
+  return $files;
+}
+
+/**
+ * Helper to manually add a single translation string.
+ *
+ * @param  string $source      Source string.
+ * @param  string $langcode    Language code to import string into.
+ * @param  string $translation Translation to language specified in $langcode.
+ * @param  string $context     The context of this string.
+ * @param  string $textgroup   Name of textgroup to store translation in.
+ */
+function ltools_add_translation($source, $translation, $langcode, $context = '', $textgroup = 'default') {
+  require_once DRUPAL_ROOT . '/includes/locale.inc';
+
+  $report = &drupal_static(__FUNCTION__, array('additions' => 0, 'updates' => 0, 'deletes' => 0, 'skips' => 0));
+  _locale_import_one_string_db($report, $langcode, $context, $source, $translation, $textgroup, 'Manual import via helper ' . __FUNCTION__ .'().', LOCALE_IMPORT_OVERWRITE);
+
+ // Clearing caches after adding strings.
+  ltools_clear_cache();
+}
+
+/**
+ * Helper to clear the locale cache.
+ */
+function ltools_clear_cache() {
+  require_once DRUPAL_ROOT . '/includes/locale.inc';
+  // Clear locale cache.
+  _locale_invalidate_js();
+  cache_clear_all('locale:', 'cache', TRUE);
+}
