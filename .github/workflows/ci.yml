@@ -55,11 +55,18 @@ jobs:
 
       - name: Run PHPCS
         run: |
+          mapfile -d '' -t files < <(find . -path ./vendor -prune -o \( -name "*.php" -o -name "*.module" -o -name "*.inc" -o -name "*.install" -o -name "*.profile" -o -name "*.theme" \) -type f -print0)
+
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "No PHP-like Drupal files found for PHPCS."
+            exit 0
+          fi
+
           if phpcs -i | grep -Eq '(^|, )(Drupal|DrupalPractice)(,|$)'; then
-            phpcs --standard=Drupal,DrupalPractice ltools.module
+            phpcs --standard=Drupal,DrupalPractice "${files[@]}"
           else
             echo "Drupal coding standards unavailable; running PSR12 baseline."
-            phpcs --standard=PSR12 ltools.module
+            phpcs --standard=PSR12 "${files[@]}"
           fi
 
       - name: Run PHPUnit when configured
