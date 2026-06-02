@@ -62,7 +62,7 @@ jobs:
             exit 0
           fi
 
-          if phpcs -i | grep -Eq '(^|, )(Drupal|DrupalPractice)(,|$)'; then
+          if phpcs -i | grep -Eq '(^|,[ ]?)(Drupal|DrupalPractice)(,|$)'; then
             phpcs --standard=Drupal,DrupalPractice "${files[@]}"
           else
             echo "Drupal coding standards unavailable; running PSR12 baseline."
