@@ -25,6 +25,7 @@ class TranslationManager {
    *
    * @param array<string, mixed> $addLanguageOptions
    *   Optional language options used when creating a language.
+   *   Existing configured languages are preserved and not modified.
    */
   public function importPoFile(string $langcode, string $poFile, bool $newLanguage = FALSE, ?int $mode = NULL, string $group = 'default', array $addLanguageOptions = []): bool {
     if (!is_file($poFile) || !is_readable($poFile)) {

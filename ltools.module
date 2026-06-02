@@ -15,7 +15,8 @@
  * @param bool $new_lang
  *   Whether to create the language if it does not exist.
  * @param int|null $mode
- *   Import mode. Defaults to LOCALE_IMPORT_OVERWRITE when available.
+ *   Import mode. NULL defers to TranslationManager default behavior
+ *   (LOCALE_IMPORT_OVERWRITE when available).
  * @param string $group
  *   Text group to import into.
  * @param array<string, mixed> $add_language_options
@@ -25,13 +26,11 @@
  *   TRUE on success, FALSE otherwise.
  */
 function ltools_update_load_language($langcode, $po_file, $new_lang = FALSE, $mode = NULL, $group = 'default', $add_language_options = []) {
-  $mode ??= defined('LOCALE_IMPORT_OVERWRITE') ? LOCALE_IMPORT_OVERWRITE : 0;
-
   return \Drupal::service('ltools.translation_manager')->importPoFile(
     (string) $langcode,
     (string) $po_file,
     (bool) $new_lang,
-    (int) $mode,
+    $mode,
     (string) $group,
     (array) $add_language_options,
   );

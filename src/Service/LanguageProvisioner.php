@@ -4,7 +4,6 @@ namespace Drupal\ltools\Service;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\Core\Language\LanguageManagerInterface;
 
 /**
  * Creates languages on demand for translation import workflows.
@@ -15,7 +14,6 @@ class LanguageProvisioner {
    * Constructs a LanguageProvisioner object.
    */
   public function __construct(
-    protected LanguageManagerInterface $languageManager,
     protected EntityTypeManagerInterface $entityTypeManager,
   ) {
   }
@@ -27,11 +25,11 @@ class LanguageProvisioner {
    *   Optional language options from the legacy wrapper API.
    */
   public function ensureLanguageExists(string $langcode, array $options = []): void {
-    if ($this->languageManager->getLanguage($langcode)) {
+    $language_storage = $this->entityTypeManager->getStorage('configurable_language');
+    if ($language_storage->load($langcode) !== NULL) {
       return;
     }
 
-    $language_storage = $this->entityTypeManager->getStorage('configurable_language');
     $direction = (int) ($options['direction'] ?? LanguageInterface::DIRECTION_LTR);
     $label = (string) ($options['name'] ?? $langcode);
 

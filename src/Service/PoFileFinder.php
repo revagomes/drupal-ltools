@@ -27,7 +27,7 @@ class PoFileFinder {
       );
     }
     else {
-      $iterator = new \IteratorIterator(new \DirectoryIterator($basePath));
+      $iterator = new \FilesystemIterator($basePath, \FilesystemIterator::SKIP_DOTS);
     }
 
     foreach ($iterator as $fileInfo) {

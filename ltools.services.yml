@@ -18,7 +18,6 @@ services:
   ltools.language_provisioner:
     class: Drupal\ltools\Service\LanguageProvisioner
     arguments:
-      - '@language_manager'
       - '@entity_type.manager'
 
   ltools.translation_manager:

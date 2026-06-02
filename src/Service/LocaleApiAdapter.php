@@ -15,9 +15,9 @@ class LocaleApiAdapter {
    */
   public function importPoFile(string $langcode, string $poFile, int $mode, string $group): bool {
     if (!function_exists('_locale_import_po')) {
-      $locale_inc = DRUPAL_ROOT . '/core/modules/locale/locale.module';
-      if (is_file($locale_inc)) {
-        require_once $locale_inc;
+      $locale_module = DRUPAL_ROOT . '/core/modules/locale/locale.module';
+      if (is_file($locale_module)) {
+        require_once $locale_module;
       }
     }
 
@@ -41,9 +41,9 @@ class LocaleApiAdapter {
    */
   public function importOneString(array &$report, string $langcode, string $context, string $source, string $translation, string $textgroup, int $mode): void {
     if (!function_exists('_locale_import_one_string_db')) {
-      $locale_inc = DRUPAL_ROOT . '/core/modules/locale/locale.bulk.inc';
-      if (is_file($locale_inc)) {
-        require_once $locale_inc;
+      $locale_bulk_inc = DRUPAL_ROOT . '/core/modules/locale/locale.bulk.inc';
+      if (is_file($locale_bulk_inc)) {
+        require_once $locale_bulk_inc;
       }
     }
 
@@ -68,9 +68,9 @@ class LocaleApiAdapter {
    */
   public function invalidateJavascriptCache(): void {
     if (!function_exists('_locale_invalidate_js')) {
-      $locale_inc = DRUPAL_ROOT . '/core/modules/locale/locale.module';
-      if (is_file($locale_inc)) {
-        require_once $locale_inc;
+      $locale_module = DRUPAL_ROOT . '/core/modules/locale/locale.module';
+      if (is_file($locale_module)) {
+        require_once $locale_module;
       }
     }
 
