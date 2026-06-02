@@ -9,6 +9,8 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Check out code
@@ -27,7 +29,15 @@ jobs:
         run: composer install --prefer-dist --no-progress --no-interaction
 
       - name: PHP syntax check
-        run: find . -path ./vendor -prune -o -name "*.php" -print0 | xargs -0 -n1 php -l
+        run: |
+          files_found=0
+          while IFS= read -r -d '' file; do
+            files_found=1
+            php -l "$file"
+          done < <(find . -path ./vendor -prune -o \( -name "*.php" -o -name "*.module" -o -name "*.inc" -o -name "*.install" -o -name "*.profile" -o -name "*.theme" \) -type f -print0)
+          if [ "$files_found" -eq 0 ]; then
+            echo "No PHP-like Drupal files found for syntax check."
+          fi
 
       - name: Validate YAML files
         run: |
@@ -45,7 +55,7 @@ jobs:
 
       - name: Run PHPCS
         run: |
-          if phpcs -i | grep -Eq 'Drupal|DrupalPractice'; then
+          if phpcs -i | grep -Eq '(^|, )(Drupal|DrupalPractice)(,|$)'; then
             phpcs --standard=Drupal,DrupalPractice ltools.module
           else
             echo "Drupal coding standards unavailable; running PSR12 baseline."
