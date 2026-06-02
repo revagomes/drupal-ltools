@@ -1,0 +1,14 @@
+{
+  "name": "revagomes/drupal-ltools",
+  "description": "A library of helpful locale helpers by Revagomes.",
+  "type": "drupal-module",
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "drupal/core": "^10.3 || ^11"
+  },
+  "autoload": {
+    "psr-4": {
+      "Drupal\\ltools\\": "src/"
+    }
+  }
+}
