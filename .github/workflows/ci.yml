@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2, phpcs
+
+      - name: Validate composer.json
+        run: composer validate --strict
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: PHP syntax check
+        run: find . -path ./vendor -prune -o -name "*.php" -print0 | xargs -0 -n1 php -l
+
+      - name: Validate YAML files
+        run: |
+          python3 -m pip install --user pyyaml
+          python3 - <<'PY'
+          from pathlib import Path
+          import yaml
+
+          for file_path in Path('.').rglob('*'):
+              if file_path.is_file() and file_path.suffix in {'.yml', '.yaml'} and 'vendor' not in file_path.parts:
+                  with file_path.open('r', encoding='utf-8') as handle:
+                      yaml.safe_load(handle)
+          print('YAML validation successful.')
+          PY
+
+      - name: Run PHPCS
+        run: |
+          if phpcs -i | grep -Eq 'Drupal|DrupalPractice'; then
+            phpcs --standard=Drupal,DrupalPractice ltools.module
+          else
+            echo "Drupal coding standards unavailable; running PSR12 baseline."
+            phpcs --standard=PSR12 ltools.module
+          fi
+
+      - name: Run PHPUnit when configured
+        run: |
+          if [ -f phpunit.xml ] || [ -f phpunit.xml.dist ]; then
+            if [ -x vendor/bin/phpunit ]; then
+              vendor/bin/phpunit
+            elif command -v phpunit >/dev/null 2>&1; then
+              phpunit
+            else
+              echo "PHPUnit configuration found but PHPUnit binary is unavailable."
+              exit 1
+            fi
+          else
+            echo "No PHPUnit configuration found; skipping tests."
+          fi
