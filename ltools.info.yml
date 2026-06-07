@@ -1,0 +1,8 @@
+name: Locale Tools
+type: module
+description: 'A library of helpful locale helpers by Revagomes.'
+package: 'Dev tool suite'
+core_version_requirement: ^10.3 || ^11
+dependencies:
+  - drupal:locale
+  - drupal:language

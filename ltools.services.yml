@@ -1,0 +1,29 @@
+services:
+  logger.channel.ltools:
+    parent: logger.channel_base
+    arguments: ['ltools']
+
+  ltools.locale_api_adapter:
+    class: Drupal\ltools\Service\LocaleApiAdapter
+
+  ltools.po_file_finder:
+    class: Drupal\ltools\Service\PoFileFinder
+
+  ltools.locale_cache_manager:
+    class: Drupal\ltools\Service\LocaleCacheManager
+    arguments:
+      - '@cache_tags.invalidator'
+      - '@ltools.locale_api_adapter'
+
+  ltools.language_provisioner:
+    class: Drupal\ltools\Service\LanguageProvisioner
+    arguments:
+      - '@entity_type.manager'
+
+  ltools.translation_manager:
+    class: Drupal\ltools\Service\TranslationManager
+    arguments:
+      - '@ltools.language_provisioner'
+      - '@ltools.locale_api_adapter'
+      - '@ltools.locale_cache_manager'
+      - '@logger.channel.ltools'
