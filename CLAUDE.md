@@ -4,55 +4,82 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**ltools** (Locale Tools) is a Drupal 7.x helper module that wraps the core `locale` module's internal APIs to simplify programmatic import and management of translations. It is a dev-tool/utility library module, not a user-facing feature module.
+**ltools** (Locale Tools) is a Drupal module that wraps the `locale` module's APIs to simplify programmatic import and management of translations. It is a dev-tool/utility library, not a user-facing feature module.
 
-- Drupal core compatibility: 7.x
+- Drupal core compatibility: `^10.3 || ^11`
 - Depends on: `locale` (Drupal core)
-- Package: Dev tool suite
+- Package: `drupal/ltools`
 
 ## Module Structure
 
-Two files only — no build system, no tests, no Composer:
-
-- `ltools.info` — module metadata for Drupal 7
-- `ltools.module` — all module logic
+```
+ltools.info.yml          — module metadata
+ltools.module            — thin backward-compatible wrappers
+ltools.services.yml      — service definitions
+src/Service/
+  TranslationManager.php   — PO import (Gettext::fileToDatabase) + single-string import (locale.storage)
+  PoFileFinder.php         — recursive/non-recursive .po discovery
+  LocaleCacheManager.php   — locale cache invalidation via CacheTagsInvalidatorInterface
+  LanguageProvisioner.php  — on-demand language creation
+composer.json            — Composer package definition (PSR-4 autoloading)
+tests/src/Kernel/
+  LtoolsTranslationTest.php — KernelTestBase integration tests
+.github/workflows/ci.yml — CI: composer validate, PHP lint, PHPCS, PHPUnit
+```
 
 ## Public API
 
-### `ltools_update_load_language($langcode, $po_file, $new_lang, $mode, $group, $add_language_options)`
+### Via services (primary usage)
 
-Imports a `.po` file into `locales_target`. Optionally registers a new language first via `locale_add_language()`. `$mode` is `LOCALE_IMPORT_OVERWRITE` or `LOCALE_IMPORT_KEEP`.
+```php
+// Import a .po file, optionally creating the language first
+\Drupal::service('ltools.translation_manager')
+  ->importPoFile('fr', '/path/to/fr.po', TRUE);
 
-### `ltools_find_po_files($path, $recursive)`
+// Find .po files recursively
+\Drupal::service('ltools.po_file_finder')
+  ->findPoFiles('/path/to/translations', TRUE);
 
-Recursively (or not) finds all `.po` files under a directory. Returns an array of full paths.
+// Add a single translation string
+\Drupal::service('ltools.translation_manager')
+  ->addTranslation('Hello', 'Bonjour', 'fr');
 
-### `ltools_add_translation($source, $translation, $langcode, $context, $textgroup)`
+// Clear locale cache
+\Drupal::service('ltools.locale_cache_manager')->clearLocaleCaches();
+```
 
-Adds a single translation string directly to the database via `_locale_import_one_string_db()`. Clears locale cache after insertion.
+### Via legacy wrappers in `ltools.module` (backward compatibility)
 
-### `ltools_clear_cache()`
+`ltools_update_load_language()`, `ltools_find_po_files()`, `ltools_add_translation()`, `ltools_clear_cache()` — these delegate to the services above.
 
-Invalidates the Drupal locale JS cache and clears the `locale:` cache bin.
+## Architecture Notes
 
-## Development Context
+`TranslationManager` uses only D10/11 public APIs:
 
-This module must be developed inside a Drupal 7 site installation. Place it at `sites/all/modules/ltools/` (or a profile's modules directory), then enable it:
+- **`importPoFile()`** — delegates to `Drupal\locale\Gettext::fileToDatabase($file, $options)` where `$file` is a `\stdClass` with `uri`, `langcode`, and `filename` properties. The `overwrite_options` array controls whether customized and non-customized strings are replaced.
+- **`addTranslation()`** — uses `locale.storage` (`StringStorageInterface`) to find-or-create source strings and translations. Strings added via this method are marked `LOCALE_CUSTOMIZED`.
+- **`LocaleCacheManager`** — calls `CacheTagsInvalidatorInterface::invalidateTags(['locale'])`.
+
+There is no `LocaleApiAdapter`. No D7 private functions (`_locale_import_po`, etc.) are used anywhere.
+
+## Development
+
+Install into a Drupal 10.3+ or 11 site:
 
 ```bash
+composer require drupal/ltools
 drush en ltools -y
 ```
 
-To test translation import manually:
+Run CI checks locally:
 
-```php
-// In a Drush php-eval or hook_update_N:
-ltools_update_load_language('fr', '/path/to/fr.po');
+```bash
+composer install
+phpcs --standard=Drupal,DrupalPractice src/ ltools.module
 ```
 
 ## Coding Conventions
 
-- Drupal 7 procedural PHP — no classes, no namespaces.
-- All functions prefixed `ltools_`.
-- Follow [Drupal coding standards](https://www.drupal.org/docs/develop/standards) (2-space indentation, `@param`/`@return` docblocks).
-- Internal Drupal locale functions (prefixed `_locale_`) are considered stable enough to call here since this module targets Drupal 7 only.
+- Drupal coding standards with 2-space indentation.
+- All procedural functions prefixed `ltools_`.
+- New logic goes into `src/Service/` classes with dependency injection via `ltools.services.yml`.
