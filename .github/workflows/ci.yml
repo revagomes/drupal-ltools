@@ -34,22 +34,7 @@ jobs:
           while IFS= read -r -d '' file; do php -l "$file"; done
 
       - name: Run PHPCS
-        run: |
-          mapfile -d '' -t files < <(find . -path ./vendor -prune -o \
-            \( -name "*.php" -o -name "*.module" -o -name "*.inc" -o -name "*.install" -o -name "*.profile" -o -name "*.theme" \) \
-            -type f -print0)
-
-          if [ "${#files[@]}" -eq 0 ]; then
-            echo "No PHP-like Drupal files found for PHPCS."
-            exit 0
-          fi
-
-          if phpcs -i | grep -Eq '(^|,[ ]?)(Drupal|DrupalPractice)(,|$)'; then
-            phpcs --standard=Drupal,DrupalPractice "${files[@]}"
-          else
-            echo "Drupal coding standards unavailable; running PSR12 baseline."
-            phpcs --standard=PSR12 --extensions=php,module,inc,install,profile,theme "${files[@]}"
-          fi
+        run: vendor/bin/phpcs
 
       - name: Run PHPUnit
         if: hashFiles('phpunit.xml', 'phpunit.xml.dist') != ''

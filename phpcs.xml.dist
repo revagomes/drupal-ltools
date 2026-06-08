@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="ltools">
+  <description>Drupal coding standards for ltools module.</description>
+  <rule ref="Drupal"/>
+  <rule ref="DrupalPractice"/>
+  <file>src/</file>
+  <file>tests/</file>
+  <file>ltools.module</file>
+  <arg name="extensions" value="php,module,inc,install,profile,theme"/>
+</ruleset>

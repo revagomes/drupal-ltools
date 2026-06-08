@@ -18,13 +18,20 @@
  *   Overwrite existing translations, including customized ones.
  * @param string $group
  *   Text group to import into.
- * @param array<string, mixed> $add_language_options
+ * @param array $add_language_options
  *   Optional language creation options.
  *
  * @return bool
  *   TRUE on success, FALSE otherwise.
  */
-function ltools_update_load_language($langcode, $po_file, $new_lang = FALSE, $overwrite = TRUE, $group = 'default', $add_language_options = []) {
+function ltools_update_load_language(
+  $langcode,
+  $po_file,
+  $new_lang = false,
+  $overwrite = true,
+  $group = 'default',
+  $add_language_options = [],
+) {
   return \Drupal::service('ltools.translation_manager')->importPoFile(
     (string) $langcode,
     (string) $po_file,
@@ -46,7 +53,7 @@ function ltools_update_load_language($langcode, $po_file, $new_lang = FALSE, $ov
  * @return string[]
  *   Full paths to detected .po files.
  */
-function ltools_find_po_files($path, $recursive = TRUE) {
+function ltools_find_po_files($path, $recursive = true) {
   return \Drupal::service('ltools.po_file_finder')->findPoFiles((string) $path, (bool) $recursive);
 }
 
@@ -66,7 +73,14 @@ function ltools_find_po_files($path, $recursive = TRUE) {
  * @param bool $overwrite
  *   Overwrite existing customized translations.
  */
-function ltools_add_translation($source, $translation, $langcode, $context = '', $textgroup = 'default', $overwrite = TRUE) {
+function ltools_add_translation(
+  $source,
+  $translation,
+  $langcode,
+  $context = '',
+  $textgroup = 'default',
+  $overwrite = true,
+) {
   \Drupal::service('ltools.translation_manager')->addTranslation(
     (string) $source,
     (string) $translation,
