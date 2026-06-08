@@ -1,9 +1,10 @@
 {
-  "name": "revagomes/drupal-ltools",
-  "description": "A library of helpful locale helpers by Revagomes.",
+  "name": "drupal/ltools",
+  "description": "Locale helper utilities for Drupal.",
   "type": "drupal-module",
   "license": "GPL-2.0-or-later",
   "require": {
+    "php": "^8.1",
     "drupal/core": "^10.3 || ^11"
   },
   "require-dev": {
