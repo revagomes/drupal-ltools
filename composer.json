@@ -14,5 +14,11 @@
     "psr-4": {
       "Drupal\\ltools\\": "src/"
     }
+  },
+  "config": {
+    "allow-plugins": {
+      "drupal/core-composer-scaffold": true,
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
   }
 }
