@@ -1,11 +1,18 @@
 # Locale Tools (`ltools`)
 
-Drupal utility module for locale import workflows.
+[![CI](https://github.com/revagomes/drupal-ltools/actions/workflows/ci.yml/badge.svg)](https://github.com/revagomes/drupal-ltools/actions/workflows/ci.yml)
+[![Drupal 10.3+](https://img.shields.io/badge/Drupal-10.3%2B-blue)](https://www.drupal.org/project/ltools)
+[![Drupal 11](https://img.shields.io/badge/Drupal-11-blue)](https://www.drupal.org/project/ltools)
+[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/gpl-2.0)
 
-## Drupal compatibility
+Drupal utility module for programmatic PO file import and translation management.
 
-- Drupal 10.3+
-- Drupal 11
+## Installation
+
+```bash
+composer require drupal/ltools
+drush en ltools -y
+```
 
 ## Services
 
