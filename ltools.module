@@ -27,8 +27,8 @@
 function ltools_update_load_language(
   $langcode,
   $po_file,
-  $new_lang = false,
-  $overwrite = true,
+  $new_lang = FALSE,
+  $overwrite = TRUE,
   $group = 'default',
   $add_language_options = [],
 ) {
@@ -53,7 +53,7 @@ function ltools_update_load_language(
  * @return string[]
  *   Full paths to detected .po files.
  */
-function ltools_find_po_files($path, $recursive = true) {
+function ltools_find_po_files($path, $recursive = TRUE) {
   return \Drupal::service('ltools.po_file_finder')->findPoFiles((string) $path, (bool) $recursive);
 }
 
@@ -79,7 +79,7 @@ function ltools_add_translation(
   $langcode,
   $context = '',
   $textgroup = 'default',
-  $overwrite = true,
+  $overwrite = TRUE,
 ) {
   \Drupal::service('ltools.translation_manager')->addTranslation(
     (string) $source,

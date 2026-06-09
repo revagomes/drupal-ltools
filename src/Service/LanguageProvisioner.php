@@ -21,7 +21,9 @@ class LanguageProvisioner {
   /**
    * Ensures a language exists.
    *
-   * @param array<string, mixed> $options
+   * @param string $langcode
+   *   The language code, for example 'fr' or 'de'.
+   * @param array $options
    *   Optional language options from the legacy wrapper API.
    */
   public function ensureLanguageExists(string $langcode, array $options = []): void {

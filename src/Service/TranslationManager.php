@@ -22,10 +22,21 @@ class TranslationManager {
   /**
    * Imports translations from a PO file.
    *
+   * @param string $langcode
+   *   The language code, for example 'fr' or 'de'.
+   * @param string $poFile
+   *   Absolute path to a readable .po file.
+   * @param bool $newLanguage
+   *   Create the language if it does not exist.
    * @param bool $overwrite
    *   Overwrite both customized and non-customized existing translations.
-   * @param array<string, mixed> $addLanguageOptions
+   * @param string $group
+   *   Translation text group.
+   * @param array $addLanguageOptions
    *   Optional language options used when $newLanguage is TRUE.
+   *
+   * @return bool
+   *   TRUE on success, FALSE on failure.
    */
   public function importPoFile(
     string $langcode,
@@ -80,6 +91,16 @@ class TranslationManager {
   /**
    * Adds one translation string to locale storage.
    *
+   * @param string $source
+   *   The source string in English.
+   * @param string $translation
+   *   The translated string.
+   * @param string $langcode
+   *   The language code, for example 'fr' or 'de'.
+   * @param string $context
+   *   The string context.
+   * @param string $textgroup
+   *   The translation text group.
    * @param bool $overwrite
    *   If FALSE, skips strings already marked as customized in locale storage.
    */
