@@ -1,8 +1,7 @@
 name: Locale Tools
 type: module
-description: 'A library of helpful locale helpers by Revagomes.'
-package: 'Dev tool suite'
+description: 'Utility services for programmatic PO file import and translation management. Wraps the locale module API for use in custom modules and update hooks.'
+package: Translation
 core_version_requirement: ^10.3 || ^11
 dependencies:
   - drupal:locale
-  - drupal:language
